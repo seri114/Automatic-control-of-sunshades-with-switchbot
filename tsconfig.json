@@ -1,0 +1,8 @@
+// tsconfig.json
+{
+    "compilerOptions": {
+      "lib": ["esnext"],
+      "experimentalDecorators": true,
+      "strict": true
+    }
+  }
