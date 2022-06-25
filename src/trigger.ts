@@ -99,6 +99,9 @@ function _setProperty(id: string, param: any){
 
 
 function closeShade() {
+  if (!_judgeClose()){
+    return
+  }
   _pressSwitchbot(_getProperty("closeShadeDeviceId", "set valid closeShadeDeviceId"))
 }
 
@@ -184,6 +187,28 @@ function _fetchSunsetDate(): Date {
   var d = new Date()
   d.setHours(s.getHours(), s.getMinutes())
   return d
+}
+
+
+function _judgeClose(): boolean {
+  var lat = _getNumberProperty("lat", 35.635032)
+  var lng = _getNumberProperty("lng", 139.756410)
+  var requestUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&hourly=temperature_2m,rain&daily=shortwave_radiation_sum&timezone=Asia%2FTokyo`
+  var response = UrlFetchApp.fetch(requestUrl)
+  var responseText = response.getContentText()
+  var parsedResponse = JSON.parse(responseText)
+  try{
+    var today_shortwave_radiation_sum = parsedResponse.daily.shortwave_radiation_sum[0]
+    if (today_shortwave_radiation_sum < 20){
+      console.log(`too low shortwave_radiation_sum: ${today_shortwave_radiation_sum}`)
+      return false
+    }else{
+      return true
+    }
+  }catch(e : any){
+    console.log(e.toString())
+    return true
+  }
 }
 
 function _addHours(date: Date, numOfHours: number, numOfMinutes?: number): Date {
